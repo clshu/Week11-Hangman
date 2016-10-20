@@ -67,10 +67,10 @@ gamesLeft = gameData.length;
 
 var game = null;
 
-//console.log(game.word.answer);
-//console.log(game.word.guesses);
-//console.log(game.word.letters);
-
+console.log('Press a key to guess the right answer...');
+console.log('Ctr-c to exit the program or it starts a new game after ' + Game.getMaxCount() + ' tries.');
+console.log('Any key other than a-z or A-Z will be ignored.')
+console.log('Hit any key to start!');
 
 readline.emitKeypressEvents(process.stdin);
 
@@ -84,7 +84,7 @@ process.stdin.on('keypress', (str, key) => {
 		game = new Game(gameData);
 		extraMsg = 'New Game Starts .........';
 	} else {
-		extraMsg = 'Continuing .........';
+		extraMsg = 'Continuing ..............';
 		game.count--;
   		if (key.ctrl && key.name === 'c') {
    			process.exit();
@@ -112,10 +112,7 @@ process.stdin.on('keypress', (str, key) => {
   	displayAll(game);
 });
 
-console.log('Press a key to guess the right answer...');
-console.log('Ctr-c to exit the progame or it starts a new game after ' + Game.getMaxCount() + ' tries.');
-console.log('Any key other than a-z or A-Z will be ignored.')
-console.log('Hit any to start!');
+
 
 
 

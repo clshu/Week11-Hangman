@@ -1,0 +1,23 @@
+{
+  "name": "node-hangman",
+  "version": "1.0.0",
+  "description": "Revist hangman game. Node.js console version. ",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clshu/Week11-Hangman.git"
+  },
+  "keywords": [
+    "keypress",
+    "hangman"
+  ],
+  "author": "Chin-Long Shu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/clshu/Week11-Hangman/issues"
+  },
+  "homepage": "https://github.com/clshu/Week11-Hangman#readme"
+}
