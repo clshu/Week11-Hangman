@@ -1,16 +1,16 @@
 const readline = require('readline');
 
-const Game = require('./game');
-const maxGuessCount = 20;
-var guessCount = maxGuessCount;
+var Game = require('./game');
 
+// Global variables
 var gameData = [];
-var wins = 0;
-var losses = 0;
-var gameLeft = 0;
+var winCount = 0;
+var lossCount = 0;
+var gamesLeft = 0;
 var extraMsg = '';
+var isNewGame = true;
 
-var answers = [
+const answers = [
 	"Aqaba",
 	"Galapagos",
 	"Mondoshawans",
@@ -22,80 +22,100 @@ var answers = [
 	"Unknown",
 	"Casablanca"
 ];
-
+// Functions
 function loadData () {
+	// Clone answers
 	answers.forEach(function (item) {
 		gameData.push(item);
 	});
 }
 
+function displayAll(game) {
+	//var gamesLeft = gameData.length + 1; // extra 1 is the one game selected and running
+	console.log('-----------------------------');
+	console.log(extraMsg);
+	game.word.displayResult();
+	game.word.displayGuesses();
+	console.log('Guesses Left:  ' + game.count);
+	console.log('Wins: ' + winCount + '  Losses: ' + lossCount + '  Games Left: ' + gameData.length);
+}
 
+function postProcessing(game, result) {
+	if (result == "win") {
+		winCount++;
+		extraMsg = 'You Won! Hit any key to start a new game.';
+	} else if (result == "loss") {
+		lossCount++;
+		extraMsg = 'You Lost! Hit any key to start a new game.';
+	} else {
+		extraMsg = "Argumnet error: " + result;
+	}
+
+	isNewGame = true;
+
+	if (gameData.length == 0) {
+		displayAll(game);
+		console.log('Game Over!!!');
+		process.exit();
+	}
+	
+}
 // Main Program
 
 loadData();
+gamesLeft = gameData.length;
 
-var game = new Game(gameData);
+var game = null;
 
 //console.log(game.word.answer);
 //console.log(game.word.guesses);
 //console.log(game.word.letters);
 
-function displayAll(game) {
-	console.log('-----------------------------');
-	console.log(extraMsg);
-	game.word.displayResult();
-	game.word.displayGuesses();
-	console.log('Guesses Left:  ' + guessCount);
-}
 
 readline.emitKeypressEvents(process.stdin);
-//process.stdin.setRawMode(true);
+
 if (process.stdin.isTTY)
   process.stdin.setRawMode(true);
 
 process.stdin.on('keypress', (str, key) => {
-	
-	guessCount--;
-	if (guessCount <= 0) {
-		console.log('Game Over. You Lost. Answer: ' + game.word.answer.join(''));
-		process.exit();
-	}
-	
-  	
-  	if (key.ctrl && key.name === 'c') {
-   		process.exit();
-  	} else if (key.name && key.name.length == 1 &&
-  		key.name >= 'a' && key.name <= 'z') {
-   		//console.log(`You pressed the "${str}" key`);
-    	//console.log();
-    	//console.log(key);
-    	//console.log();
-    	debugger;
-    	//console.log('key.name: ' + key.name);
-    	if (game.word.isGuessed(key.name)) {
-    		console.log(key.name + ' is guessed.');
-    	} else {
-    		game.word.addGuess(key.name);
-    		// Test if key.name is found in the answer
-    		var isFound = game.word.find(key.name);
-    		// If key.name is found in the answer
-    		// and all letters matched answer.
-    		if (isFound && game.word.isMatched()) {
-    			extraMsg = 'You Win.'
-    			displayAll(game);
-    			process.exit();
-    		} 
-    	}
 
+	if (isNewGame) {
+		isNewGame = false;
+		game = new Game(gameData);
+		extraMsg = 'New Game Starts .........';
+	} else {
+		extraMsg = 'Continuing .........';
+		game.count--;
+  		if (key.ctrl && key.name === 'c') {
+   			process.exit();
+  		} else if (key.name && key.name.length == 1 &&
+  			key.name >= 'a' && key.name <= 'z') {
+
+    		if (game.word.isGuessed(key.name)) {
+    			extraMsg = key.name + ' is guessed.';
+    		} else {
+    			game.word.addGuess(key.name);
+    			// Test if key.name is found in the answer
+    			var isFound = game.word.find(key.name);
+    			// if letter is found in the answer,
+				// and all letters match answer
+    			if (isFound && game.word.isMatched()) {
+    				postProcessing(game, "win");
+    			} 
+    		}
+  		}
+  		if (game.count == 0 && !(isFound && game.word.isMatched())) {
+  			postProcessing(game, "loss");
+  		}
   	}
 
   	displayAll(game);
 });
 
 console.log('Press a key to guess the right answer...');
-console.log('Ctr-c to exit the progame or it exists after ' + maxGuessCount + ' tries.');
+console.log('Ctr-c to exit the progame or it starts a new game after ' + Game.getMaxCount() + ' tries.');
 console.log('Any key other than a-z or A-Z will be ignored.')
-displayAll(game);
+console.log('Hit any to start!');
 
 
 

@@ -1,4 +1,5 @@
 const Word = require('./word');
+const maxGuessCount = 3;
 // Generate random integer between min(included) and max (excluded)
 function getRandomInt(min, max) {
 	var min = Math.ceil(min);
@@ -8,12 +9,23 @@ function getRandomInt(min, max) {
 
 module.exports = function Game(gameData) {
 	this.word = null;
+	this.over = false;
+	this.count = maxGuessCount;
 	this.initialize = function () {
+		/*
+		if (gameData.length == 0) {
+			this.over = true;
+			return;
+		}
+		*/
 		var index = getRandomInt(0, gameData.length);
 		this.word = new Word(gameData[index]);
 		// Remove selected one, so it won't be selected again
-		// if it needs multiple game
 		gameData.splice(index, 1);
 	};
 	this.initialize();
+}
+
+module.exports.getMaxCount = function () {
+	return maxGuessCount;
 }
