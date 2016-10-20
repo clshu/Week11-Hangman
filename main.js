@@ -34,6 +34,7 @@ function displayAll(game) {
 	//var gamesLeft = gameData.length + 1; // extra 1 is the one game selected and running
 	console.log('-----------------------------');
 	console.log(extraMsg);
+	console.log('');
 	game.word.displayResult();
 	game.word.displayGuesses();
 	console.log('Guesses Left:  ' + game.count);
@@ -46,7 +47,8 @@ function postProcessing(game, result) {
 		extraMsg = 'You Won! Hit any key to start a new game.';
 	} else if (result == "loss") {
 		lossCount++;
-		extraMsg = 'You Lost! Hit any key to start a new game.';
+		extraMsg = 'You Lost! Answer: ' + game.word.answer.join('');
+		extraMsg += '\nHit any key to start a new game.';
 	} else {
 		extraMsg = "Argumnet error: " + result;
 	}
@@ -55,7 +57,7 @@ function postProcessing(game, result) {
 
 	if (gameData.length == 0) {
 		displayAll(game);
-		console.log('Game Over!!!');
+		console.log('\nGame Over!!!');
 		process.exit();
 	}
 	
@@ -79,6 +81,10 @@ if (process.stdin.isTTY)
 
 process.stdin.on('keypress', (str, key) => {
 
+	if (key.ctrl && key.name === 'c') {
+   			process.exit();
+  	}
+
 	if (isNewGame) {
 		isNewGame = false;
 		game = new Game(gameData);
@@ -86,11 +92,12 @@ process.stdin.on('keypress', (str, key) => {
 	} else {
 		extraMsg = 'Continuing ..............';
 		game.count--;
-  		if (key.ctrl && key.name === 'c') {
-   			process.exit();
-  		} else if (key.name && key.name.length == 1 &&
+  		if (!key.ctrl && !key.meta && key.name && key.name.length == 1 &&
   			key.name >= 'a' && key.name <= 'z') {
-
+  			// !key.ctrl && !key.meta -> Skip Ctrl + * and Meta + * keystrokes
+  			// key.name == true -> Skip special characters such as '!', '@', etc.
+  			// key.name.length == 1 -> Skip 'tab', 'return', 'up', 'down', etc.
+  			// The upper case letters has key.name in lower case and key.shift == true
     		if (game.word.isGuessed(key.name)) {
     			extraMsg = key.name + ' is guessed.';
     		} else {
