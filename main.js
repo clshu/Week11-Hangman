@@ -1,6 +1,6 @@
 const readline = require('readline');
 
-var Game = require('./game');
+const Game = require('./game');
 
 // Global variables
 var gameData = [];

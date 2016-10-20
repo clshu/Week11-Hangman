@@ -1,5 +1,5 @@
 const Word = require('./word');
-const maxGuessCount = 3;
+const maxGuessCount = 20;
 // Generate random integer between min(included) and max (excluded)
 function getRandomInt(min, max) {
 	var min = Math.ceil(min);
